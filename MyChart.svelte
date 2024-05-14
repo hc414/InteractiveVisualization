@@ -120,6 +120,7 @@
           );
         removeOverlay();
         removeGraph();
+        removeButtons();
       }
 
       //   funcion switch_data(){
@@ -127,13 +128,17 @@
       //   }
 
       function clicked(event, d) {
+        showPlot();
+
         const overlay = document.getElementById("overlay");
         overlay.style.display = "block"; // Show the overlay
         overlay.style.filter = "blur(10px)"; // Apply blur effect
         const graph = document.getElementById("linePlot");
         graph.style.display = "block";
-        const closeButton = document.getElementById("close-button");
-        closeButton.addEventListener("click", () => {
+        const butt = document.getElementById("buttons-container");
+        butt.style.display = "grid";
+        const resetButton = document.getElementById("resetButton");
+        resetButton.addEventListener("click", () => {
           reset();
         });
 
@@ -202,30 +207,44 @@
         graph.style.display = "none";
       }
 
-      const closeButton = svg
-        .append("g")
-        .attr("id", "close-button")
-        .style("cursor", "pointer")
-        .on("click", reset) // Reset function on click
-        .attr("transform", `translate(${width - 150}, 10)`);
+      function removeButtons() {
+        const buttons = document.getElementById("buttons-container");
+        buttons.style.display = "none";
+      }
 
-      closeButton
-        .append("rect")
-        .attr("width", 80)
-        .attr("height", 40)
-        .attr("rx", 10)
-        .attr("ry", 10)
-        .attr("fill", "#d6d6d6");
+      function showPlot() {
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("linePlot").style.display = "block";
+      }
 
-      closeButton
-        .append("text")
-        .attr("x", 40)
-        .attr("y", 20)
-        .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "middle")
-        .text("Reset")
-        .style("font-size", "24px")
-        .style("fill", "#333");
+      function hidePlot() {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("lineRequest").style.display = "none";
+      }
+      //   const closeButton = svg
+      //     .append("g")
+      //     .attr("id", "close-button")
+      //     .style("cursor", "pointer")
+      //     .on("click", reset) // Reset function on click
+      //     .attr("transform", `translate(${width - 150}, 10)`);
+
+      //   closeButton
+      //     .append("rect")
+      //     .attr("width", 80)
+      //     .attr("height", 40)
+      //     .attr("rx", 10)
+      //     .attr("ry", 10)
+      //     .attr("fill", "#d6d6d6");
+
+      //   closeButton
+      //     .append("text")
+      //     .attr("x", 40)
+      //     .attr("y", 20)
+      //     .attr("text-anchor", "middle")
+      //     .attr("alignment-baseline", "middle")
+      //     .text("Reset")
+      //     .style("font-size", "24px")
+      //     .style("fill", "#333");
 
       svg
         .append("g")
@@ -237,10 +256,10 @@
         .style("display", "none")
         .style("cursor", "pointer");
 
-
       document.getElementById("chart-container").appendChild(svg.node());
     });
   });
+
   // Mock function to demonstrate plot updating
   function updateLinePlot(data, stateName, isConfirmed) {
     const svg = d3.select("#linePlot");
@@ -278,16 +297,34 @@
 
     g.append("g").call(d3.axisLeft(y));
 
-    g.selectAll(".bar")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", (d) => x(d.date))
-      .attr("width", x.bandwidth())
-      .attr("y", (d) => y(d.value))
-      .attr("height", (d) => height - y(d.value))
-      .attr("fill", "steelblue");
+    // g.selectAll(".bar")
+    //   .data(data)
+    //   .enter()
+    //   .append("rect")
+    //   .attr("class", "bar")
+    //   .attr("x", (d) => x(d.date))
+    //   .attr("width", x.bandwidth())
+    //   .attr("y", (d) => y(d.value))
+    //   .attr("height", (d) => height - y(d.value))
+    //   .attr("fill", "steelblue");
+
+    const xAxisLabel = svg
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("text-anchor", "middle") // Center the text
+      .attr("x", width / 2 + 100) // Center horizontally
+      .attr("y", height + margin.bottom + 10) // Position below the x-axis
+      .text("Date"); // The label text
+
+    const yAxisLabel = svg
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("text-anchor", "middle") // This will align the center of the text with the specified coordinates
+      .attr(
+        "transform",
+        `translate(${-margin.left + 130}, ${height / 2 + 40}) rotate(-90)`
+      ) // Moves the label to the left and rotates it
+      .text("Number of Cases"); // The text for the label
 
     if (isConfirmed) {
       svg
@@ -297,7 +334,17 @@
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
         .style("text-decoration", "underline")
-        .text("COVID-19 Cases confirmed in " + stateName);
+        .text("Cumulative COVID-19 Case Count in " + stateName);
+      g.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d) => x(d.date))
+        .attr("width", x.bandwidth())
+        .attr("y", (d) => y(d.value))
+        .attr("height", (d) => height - y(d.value))
+        .attr("fill", "steelblue");
     } else {
       svg
         .append("text")
@@ -306,7 +353,17 @@
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
         .style("text-decoration", "underline")
-        .text("COVID-19 Deaths in " + stateName);
+        .text("Cumulative COVID-19 Death Count in  " + stateName);
+      g.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", (d) => x(d.date))
+        .attr("width", x.bandwidth())
+        .attr("y", (d) => y(d.value))
+        .attr("height", (d) => height - y(d.value))
+        .attr("fill", "red");
     }
   }
 </script>
@@ -316,40 +373,144 @@
 <!-- <button id="confirmButton">Confirm</button>
 <button id="deathButton">Death</button> -->
 
-<div id="chart-container">
-    <!-- Place the overlay directly inside the container -->
-    <div id="overlay"></div>
+<!-- <div id="chart-container">
+  <div id="overlay"></div>
 
-    <!-- Place the bar chart SVG after the overlay -->
-    <svg id="linePlot" width="1000" height="400"></svg>
-<button id="confirmButton">Confirm</button>
-<button id="deathButton">Death</button>
+  <div id="plot-and-controls">
+    <svg id="linePlot" width="800" height="400"></svg>
+    <div id="reset">
+      <button id="resetButton">Reset</button>
+    </div>
+
+    <div id="buttons-container">
+      <button id="confirmButton">Confirm</button>
+      <button id="deathButton">Death</button>
+    </div>
+  </div>
+</div> -->
+<div id="chart-container">
+  <div id="overlay"></div>
+  <div id="plot-and-controls" style="position: absolute;">
+    <svg id="linePlot" width="750" height="410"></svg>
+    <div id="reset">
+      <button id="resetButton">Reset</button>
+    </div>
+    <div id="buttons-container">
+      <button id="confirmButton">Confirm</button>
+      <button id="deathButton">Death</button>
+    </div>
+  </div>
 </div>
 
 <style>
   /* Add any necessary CSS styles here */
-  .bar {
-    fill: steelblue;
-  }
-  #overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
-    display: none; /* Initially hidden */
-    z-index: 200; /* Ensure it's above the SVG */
-    pointer-events: none; /* Allow mouse events to pass through */
-}
 
-#linePlot {
+  #chart-container {
+    /* display: absolute;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+    width: 100%;
+    height: 100vh; */
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  #overlay {
+    position: fixed; /* Use fixed instead of absolute to ensure it covers the whole viewport */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    background-color: rgba(55, 54, 54, 0.7); /* Semi-transparent black */
+    display: none; /* Initially hidden */
+    z-index: 200; /* High z-index to ensure it is above other content */
+    pointer-events: auto; /* Typically, you might want this disabled to allow clicks to pass through when hidden */
+  }
+  /* #overlay {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 300; /* Ensure it's above the overlay */
+    width: 975px;
+    height: 610px;
+    background-color: rgba(55, 54, 54, 0.7); 
+    display: none; 
+    z-index: 200;
+    pointer-events: auto; 
+  } */
+
+  /* #linePlot {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 750px;
+    height: 410px;
+    z-index: 300;
     pointer-events: none;
     display: none;
-}
+    margin: auto;
+    transform: translate(-50, 50);
+    background-color: white;
+  } */
 
+  #linePlot {
+    position: absolute;
+    top: 50%; /* Position the top edge of the element at the center of the viewport */
+    left: 50%; /* Position the left edge of the element at the center of the viewport */
+    width: 750px;
+    height: 410px;
+    z-index: 300;
+    pointer-events: none;
+    display: none;
+    margin: auto;
+    transform: translate(
+      -50%,
+      -50%
+    ); /* Adjust the position of the element to center it exactly */
+    background-color: white;
+  }
+
+  #plot-and-controls {
+    display: flex; /* Aligns children (SVG and buttons container) horizontally */
+    z-index: 300; /* Ensures it's above the overlay */
+  }
+
+  #buttons-container {
+    position: absolute; /* Position it relative to the nearest positioned ancestor */
+    bottom: 80px; /* Position at the top with some margin */
+    left: 250px; /* Align it to the right side */
+    z-index: 400; /* Higher z-index to be on top of other elements */
+    display: none;
+    flex-direction: column; /* Buttons stacked vertically */
+    overflow: auto;
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.9
+    ); /* Optional: add a slight background */
+  }
+
+  #reset {
+    position: absolute; /* Position it relative to the nearest positioned ancestor */
+    bottom: 263px; /* Position at the top with some margin */
+    left: 430px; /* Align it to the right side */
+    z-index: 400; /* Higher z-index to be on top of other elements */
+    display: flex;
+  }
+  /* button {
+    margin-bottom: 8px;
+    cursor: pointer; 
+  } */
+
+  /* #buttons-container {
+  display: flex;
+  flex-direction: column; 
+  /* padding-left: 20px; 
+}  */
 </style>
