@@ -315,7 +315,7 @@
       .attr("x", width / 2 + 100) // Center horizontally
       .attr("y", height + margin.bottom + 10) // Position below the x-axis
       .text("Date"); // The label text
-
+    
     const yAxisLabel = svg
       .append("text")
       .attr("class", "axis-label")
@@ -335,11 +335,11 @@
         .style("font-size", "16px")
         .style("text-decoration", "underline")
         .text("Cumulative COVID-19 Case Count in " + stateName);
-      g.selectAll(".bar")
+      g.selectAll(".line")
         .data(data)
         .enter()
         .append("rect")
-        .attr("class", "bar")
+        .attr("class", "line")
         .attr("x", (d) => x(d.date))
         .attr("width", x.bandwidth())
         .attr("y", (d) => y(d.value))
